@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use SebastianBergmann\CodeCoverage\Report\Xml\Report;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
@@ -37,4 +38,9 @@ class User extends Authenticatable
         'email',
         'role'
     ];
+
+    public function reports()
+    {
+        return $this->hasMany(ReportedRoad::class);
+    }
 }

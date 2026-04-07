@@ -1,4 +1,14 @@
 <x-app-layout>
+
+    @if ($errors->any())
+    <div class="bg-red-100 text-red-600 p-4">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
         <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Pelaporan') }}
@@ -13,5 +23,22 @@
                 </div>
             </div>
         </div>
+    </div>
+    
+
+    <div>
+        <form class="flex items-center justify-center" 
+            action="{{ route('laporan') }}" 
+            method="POST" 
+            enctype="multipart/form-data"> @csrf <label>Nama Jalanan : </label> 
+            <input type="text" name="nama_jalanan" placeholder="Masukkan nama jalanan">
+            
+            <input type="file" name="path_foto_jalanan">
+
+            <input type="hidden" name="latitude" id="latitude_input">
+            <input type="hidden" name="longitude" id="longitude_input">
+
+            <button type="submit" class="">Submit</button>
+        </form>
     </div>
 </x-app-layout>
