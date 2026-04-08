@@ -45,7 +45,27 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tandai Lokasi</label>
-                            <div id="map" class="w-full rounded-lg shadow-sm border border-gray-300 dark:border-gray-700" style="height: 550px; z-index: 10;"></div>
+                            
+                            <div id="map-wrapper" class="relative w-full h-64 sm:h-72 rounded-lg shadow-sm border border-gray-300 dark:border-gray-700 overflow-hidden transition-all duration-300">
+                                
+                                <div id="map-click-overlay" class="absolute inset-0 z-[500] cursor-pointer bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors">
+                                    <span class="bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full text-sm font-medium shadow-sm pointer-events-none flex items-center space-x-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                        </svg>
+                                        <span>Klik untuk perbesar & pilih lokasi</span>
+                                    </span>
+                                </div>
+
+                                <div id="map" class="w-full h-full z-10"></div>
+                                
+                                <button type="button" id="close-map-btn" class="hidden absolute top-4 right-4 z-[1000] bg-gray-900/90 text-white px-4 py-2 rounded-md shadow-lg hover:bg-black focus:outline-none flex items-center space-x-2 backdrop-blur-sm transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="text-sm font-semibold tracking-wide">Tutup Peta</span>
+                                </button>
+                            </div>
                             
                             <input type="hidden" name="latitude" id="latitude_input">
                             <input type="hidden" name="longitude" id="longitude_input">
@@ -65,23 +85,75 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var map = L.map('map').setView([-6.200000, 106.816666], 13); 
+            var defaultLat = -6.200000;
+            var defaultLng = 106.816666;
+            
+            const latInput = document.getElementById('latitude_input');
+            const lngInput = document.getElementById('longitude_input');
+            latInput.value = defaultLat;
+            lngInput.value = defaultLng;
+
+            var map = L.map('map', {
+                scrollWheelZoom: false 
+            }).setView([defaultLat, defaultLng], 13); 
 
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution: '&copy; OpenStreetMap'
             }).addTo(map);
 
-            var marker = L.marker([-6.200000, 106.816666]).addTo(map);
+            var marker = L.marker([defaultLat, defaultLng]).addTo(map);
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var userLat = position.coords.latitude;
+                    var userLng = position.coords.longitude;
+
+                    map.setView([userLat, userLng], 16); 
+                    marker.setLatLng([userLat, userLng]);
+
+                    latInput.value = userLat;
+                    lngInput.value = userLng;
+                }, function(error) {
+                    console.log("Akses lokasi ditolak atau gagal. Menggunakan lokasi default.");
+                });
+            }
 
             map.on('click', function(e) {
                 var lat = e.latlng.lat;
                 var lng = e.latlng.lng;
                 
                 marker.setLatLng(e.latlng);
+                latInput.value = lat;
+                lngInput.value = lng;
+            });
+
+            const mapWrapper = document.getElementById('map-wrapper');
+            const mapOverlay = document.getElementById('map-click-overlay');
+            const closeMapBtn = document.getElementById('close-map-btn');
+
+            mapOverlay.addEventListener('click', function() {
+                mapWrapper.classList.remove('relative', 'h-64', 'sm:h-72', 'rounded-lg', 'border', 'border-gray-300', 'dark:border-gray-700');
+                mapWrapper.classList.add('fixed', 'inset-0', 'z-[9999]', 'h-screen', 'w-screen', 'bg-gray-900');
                 
-                document.getElementById('latitude_input').value = lat;
-                document.getElementById('longitude_input').value = lng;
+                mapOverlay.classList.add('hidden');
+                closeMapBtn.classList.remove('hidden');
+                
+                map.scrollWheelZoom.enable();
+
+                setTimeout(() => map.invalidateSize(), 300);
+            });
+
+            closeMapBtn.addEventListener('click', function() {
+                mapWrapper.classList.remove('fixed', 'inset-0', 'z-[9999]', 'h-screen', 'w-screen', 'bg-gray-900');
+                mapWrapper.classList.add('relative', 'h-64', 'sm:h-72', 'rounded-lg', 'border', 'border-gray-300', 'dark:border-gray-700');
+                
+                mapOverlay.classList.remove('hidden');
+                closeMapBtn.classList.add('hidden');
+
+                map.scrollWheelZoom.disable();
+
+                setTimeout(() => map.invalidateSize(), 300);
             });
 
             setTimeout(function() {
