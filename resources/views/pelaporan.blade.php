@@ -38,9 +38,20 @@
                         </div>
 
                         <div>
-                            <label for="path_foto_jalanan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto Jalanan</label>
-                            <input type="file" name="path_foto_jalanan" id="path_foto_jalanan" 
-                                class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600 cursor-pointer transition duration-150">
+                            <label for="path_foto_jalanan" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Foto Kondisi Jalanan
+                            </label>
+                            <div class="mt-1 flex items-center space-x-4">
+                                <input type="file" name="path_foto_jalanan" id="path_foto_jalanan" accept="image/*"
+                                    class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-gray-700 dark:file:text-indigo-400 cursor-pointer transition-all">
+                            </div>
+                            
+                            <div id="image-preview-container" class="hidden mt-4">
+                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Pratinjau Foto:</p>
+                                <div class="relative w-full sm:max-w-md rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-gray-50 dark:bg-gray-900">
+                                    <img id="image-preview" src="" alt="Pratinjau" class="w-full h-auto object-cover max-h-64">
+                                </div>
+                            </div>
                         </div>
 
                         <div>
