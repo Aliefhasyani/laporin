@@ -55,6 +55,11 @@
                                 class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600 cursor-pointer transition duration-150">
                         </div>
 
+                       <div id="image-preview-container" class="hidden mt-4">
+                            <p class="text-xs text-gray-500 mb-2">Pratinjau Foto:</p>
+                            <img id="image-preview" src="" class="rounded-lg max-h-64 object-cover border dark:border-gray-700">
+                       </div>
+
                         <div>
                             <div class="flex items-center justify-between mb-2">
                                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Tandai Lokasi Kejadian</label>
@@ -126,7 +131,7 @@
                     previewContainer.classList.add('hidden');
                 }
             });
-            // ---------------------------
+          
 
             var defaultLat = -6.200000;
             var defaultLng = 106.816666;
@@ -176,7 +181,6 @@
             const closeMapBtn = document.getElementById('close-map-btn');
 
             mapOverlay.addEventListener('click', function() {
-                // Switch to Fullscreen mode
                 mapWrapper.classList.remove('relative', 'h-72', 'rounded-xl', 'border-2');
                 mapWrapper.classList.add('fixed', 'inset-0', 'z-[9999]', 'w-full', 'h-full');
                 
