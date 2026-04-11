@@ -37,4 +37,12 @@ class PelaporanController extends Controller
 
         return redirect()->route('dashboard')->with('success','Berhasil Membuat Laporan!');
     }
+
+    public function showLaporan($id)
+    {
+        $laporan = ReportedRoad::findOrFail($id);
+
+        return view('officer.detail-laporan',compact('laporan'));
+    }
+
 }

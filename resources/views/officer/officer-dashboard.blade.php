@@ -22,6 +22,7 @@
                                 <th scope="col" class="px-6 py-4 font-semibold border-b dark:border-gray-600">Status</th>
                                 <th scope="col" class="px-6 py-4 font-semibold border-b dark:border-gray-600">Latitude</th>
                                 <th scope="col" class="px-6 py-4 font-semibold border-b dark:border-gray-600">Longitude</th>
+                                <th scope="col" class="px-6 py-4 font-semibold border-b dark:border-gray-600">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -52,6 +53,12 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ $report->longitude }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <a href="{{ route('officer.show-laporan',$report->id) }}"
+                                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                                            Lihat Laporan
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
