@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LeafletController;
+use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\PelaporanController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +23,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('role:officer')->group(function () {
-    Route::get('/officer/dashboard',[AuthController::class,'officerDashboard'])->name('officer.dashboard');
+    Route::get('/officer/dashboard',[OfficerController::class,'officerDashboard'])->name('officer.dashboard');
 });
 
 
