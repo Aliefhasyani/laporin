@@ -40,7 +40,7 @@ class PelaporanController extends Controller
 
     public function showLaporan($id)
     {
-        $laporan = ReportedRoad::findOrFail($id);
+        $laporan = ReportedRoad::with('user')->findOrFail($id);
 
         return view('officer.detail-laporan',compact('laporan'));
     }
