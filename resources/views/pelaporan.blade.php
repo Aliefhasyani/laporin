@@ -47,6 +47,10 @@
                                 class="block w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200" 
                                 placeholder="Contoh: Jl. Sudirman No. 12"
                                 value="{{ old('nama_jalanan') }}">
+                            <textarea  name="deskripsi" id="deskripsi" 
+                                class="mt-4 block w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200" 
+                                placeholder="Berikan deskripsi masalah jalanan yang dilaporkan (Optional)"
+                                >{{ old('deskripsi') }}</textarea>
                         </div>
 
                         <div>

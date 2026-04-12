@@ -10,6 +10,7 @@ class ReportedRoad extends Model
 
     protected $fillable = [
         'nama_jalanan',
+        'deskripsi',
         'path_foto_jalanan',
         'latitude',
         'longitude',
