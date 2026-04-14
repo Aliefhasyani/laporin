@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('role:officer')->group(function () {
     Route::get('/officer/dashboard',[OfficerController::class,'officerDashboard'])->name('officer.dashboard');
     Route::get('/officer/laporan/{id}',[PelaporanController::class,'showLaporan'])->name('officer.show-laporan');
+    Route::delete('/officer/laporan/delete/{id}',[PelaporanController::class,'destroy'])->name('officer.destroy-laporan');
 });
 
 

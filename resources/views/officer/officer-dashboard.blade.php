@@ -59,6 +59,11 @@
                                             class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
                                             Lihat Laporan
                                         </a>
+                                        <form action="{{ route('officer.destroy-laporan',$report->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600">Hapus Laporan</button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach

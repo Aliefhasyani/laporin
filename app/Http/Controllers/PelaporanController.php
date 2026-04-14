@@ -46,4 +46,13 @@ class PelaporanController extends Controller
         return view('officer.detail-laporan',compact('laporan'));
     }
 
+    public function destroy($id)
+    {
+        $laporan = ReportedRoad::findOrFail($id);
+
+        $laporan->delete();
+
+        return redirect()->back();
+    }
+
 }
