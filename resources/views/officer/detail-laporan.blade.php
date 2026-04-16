@@ -26,11 +26,19 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100 dark:border-gray-700">
                 <div class="p-6 sm:p-10 flex flex-col lg:flex-row gap-10">
                     
-                    <div class="w-full lg:w-1/2" x-data="{ isModalOpen: false }">
-                        <div class="relative rounded-2xl overflow-hidden shadow-md border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 group cursor-pointer" @click="isModalOpen = true">
-                            @if($laporan->path_foto_jalanan)
-                                <img src="{{ asset('storage/'.$laporan->path_foto_jalanan) }}" 
-                                     alt="Foto {{ $laporan->nama_jalanan }}" 
+                    <div class="w-full lg:w-1/2" x-data="{ 
+                        isModalOpen: false, 
+                        currentImageIndex: 0,
+                        images: {{ $laporan->path_foto_jalanan ? json_encode(json_decode($laporan->path_foto_jalanan)) : json_encode([]) }},
+                        nextImage() { this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length; },
+                        prevImage() { this.currentImageIndex = (this.currentImageIndex - 1 + this.images.length) % this.images.length; }
+                    }">
+                        @if($laporan->path_foto_jalanan && count(json_decode($laporan->path_foto_jalanan)) > 0)
+                            @php $images = json_decode($laporan->path_foto_jalanan); @endphp
+                            
+                            <div class="relative rounded-2xl overflow-hidden shadow-md border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 group cursor-pointer" @click="isModalOpen = true">
+                                <img :src="'{{ asset('storage') }}/' + images[currentImageIndex]" 
+                                     :alt="'Foto {{ $laporan->nama_jalanan }} ' + (currentImageIndex + 1)"
                                      class="w-full h-auto aspect-video lg:aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-105">
                                 
                                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
@@ -38,17 +46,43 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                                     </svg>
                                 </div>
-                            @else
-                                <div class="w-full aspect-video lg:aspect-[4/3] flex flex-col items-center justify-center text-gray-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <span>Tidak ada foto tersedia</span>
+
+                                <div class="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                    <span x-text="currentImageIndex + 1"></span> / <span x-text="images.length"></span>
+                                </div>
+
+                                <!-- Navigation Arrows on Main Image -->
+                                @if(count($images) > 1)
+                                    <button @click.stop="prevImage()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                    </button>
+                                    <button @click.stop="nextImage()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+
+                            <!-- Thumbnails Gallery -->
+                            @if(count($images) > 1)
+                                <div class="mt-4 flex gap-2 overflow-x-auto pb-2">
+                                    <template x-for="(image, index) in images" :key="index">
+                                        <button 
+                                            @click="currentImageIndex = index"
+                                            :class="{'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800': currentImageIndex === index}"
+                                            class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-indigo-500 transition-all">
+                                            <img :src="'{{ asset('storage') }}/' + image" 
+                                                 class="w-full h-full object-cover"
+                                                 :alt="'Thumbnail ' + (index + 1)">
+                                        </button>
+                                    </template>
                                 </div>
                             @endif
-                        </div>
 
-                        @if($laporan->path_foto_jalanan)
+                            <!-- Modal for Fullscreen Image -->
                             <div x-show="isModalOpen" 
                                  x-cloak
                                  x-transition:enter="transition ease-out duration-300"
@@ -66,11 +100,34 @@
                                     </svg>
                                 </button>
 
-                                <div class="relative w-full max-w-6xl max-h-full flex justify-center" @click.away="isModalOpen = false">
-                                    <img src="{{ asset('storage/'.$laporan->path_foto_jalanan) }}" 
-                                         alt="Foto Fullscreen {{ $laporan->nama_jalanan }}" 
-                                         class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl">
+                                @if(count($images) > 1)
+                                    <button @click="prevImage()" class="absolute left-6 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-50">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                    </button>
+                                    <button @click="nextImage()" class="absolute right-6 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-50">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                @endif
+
+                                <div class="relative w-full max-w-6xl max-h-full flex flex-col justify-center" @click.away="isModalOpen = false">
+                                    <img :src="'{{ asset('storage') }}/' + images[currentImageIndex]" 
+                                         :alt="'Foto Fullscreen {{ $laporan->nama_jalanan }} ' + (currentImageIndex + 1)"
+                                         class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl">
+                                    <p class="text-center text-white text-sm mt-4">
+                                        <span x-text="currentImageIndex + 1"></span> / <span x-text="images.length"></span>
+                                    </p>
                                 </div>
+                            </div>
+                        @else
+                            <div class="w-full aspect-video lg:aspect-[4/3] flex flex-col items-center justify-center text-gray-400 rounded-2xl overflow-hidden shadow-md border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span>Tidak ada foto tersedia</span>
                             </div>
                         @endif
                     </div>

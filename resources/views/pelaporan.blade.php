@@ -54,14 +54,22 @@
                         </div>
 
                         <div>
-                            <label for="path_foto_jalanan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto Jalanan</label>
-                            <input type="file" name="path_foto_jalanan" id="path_foto_jalanan" 
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="path_foto_jalanan" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Foto Jalanan</label>
+                                <span id="file-count" class="text-xs text-gray-500 dark:text-gray-400">0 file dipilih</span>
+                            </div>
+                            <input type="file" name="path_foto_jalanan[]" id="path_foto_jalanan" multiple
                                 class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-gray-700 dark:file:text-gray-300 dark:hover:file:bg-gray-600 cursor-pointer transition duration-150">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Maksimal 5MB per file • Format: JPEG, PNG, JPG</p>
                         </div>
 
                        <div id="image-preview-container" class="hidden mt-4">
-                            <p class="text-xs text-gray-500 mb-2">Pratinjau Foto:</p>
-                            <img id="image-preview" src="" class="rounded-lg max-h-64 object-cover border dark:border-gray-700">
+                            <div class="flex items-center justify-between mb-3">
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Pratinjau Foto:</p>
+                               
+                            </div>
+                            <div id="preview-grid" class="flex flex-wrap gap-3">
+                            </div>
                        </div>
 
                         <div>
@@ -118,23 +126,59 @@
             const previewContainer = document.getElementById('image-preview-container');
             const imagePreview = document.getElementById('image-preview');
 
-            fileInput.addEventListener('change', function() {
-                const file = this.files[0];
+         fileInput.addEventListener('change', function() {
+            const grid = document.getElementById('preview-grid');
+            const fileCount = document.getElementById('file-count');
+            grid.innerHTML = ''; 
+            
+            fileCount.textContent = this.files.length + ' file ' + (this.files.length === 1 ? 'dipilih' : 'dipilih');
+            
+            if (this.files && this.files.length > 0) {
+                previewContainer.classList.remove('hidden');
                 
-                if (file) {
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        imagePreview.src = e.target.result;
-                        previewContainer.classList.remove('hidden');
+                Array.from(this.files).forEach((file, fileIndex) => {
+                    if (file.type.match('image.*')) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            const imgWrapper = document.createElement('div');
+                            imgWrapper.className = 'relative group';
+                            
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.className = 'rounded-lg h-24 w-24 object-cover border border-gray-300 dark:border-gray-700 shadow-sm';
+                            
+                            const removeBtn = document.createElement('button');
+                            removeBtn.type = 'button';
+                            removeBtn.className = 'absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200';
+                            removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+                            removeBtn.title = 'Hapus gambar ini';
+                            
+                            removeBtn.addEventListener('click', (function(currentIndex) {
+                                return function(e) {
+                                    e.preventDefault();
+                                    const dataTransfer = new DataTransfer();
+                                    Array.from(fileInput.files).forEach((f, i) => {
+                                        if (i !== currentIndex) dataTransfer.items.add(f);
+                                    });
+                                    fileInput.files = dataTransfer.files;
+                                    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+                                };
+                            })(fileIndex));
+                            
+                            imgWrapper.appendChild(img);
+                            imgWrapper.appendChild(removeBtn);
+                            grid.appendChild(imgWrapper);
+                        };
+                        
+                        reader.readAsDataURL(file);
                     }
-                    
-                    reader.readAsDataURL(file);
-                } else {
-                    imagePreview.src = "";
-                    previewContainer.classList.add('hidden');
-                }
-            });
+                });
+            } else {
+                previewContainer.classList.add('hidden');
+                fileCount.textContent = '0 file dipilih';
+            }
+        });
           
 
             var defaultLat = -6.200000;

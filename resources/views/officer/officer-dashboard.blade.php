@@ -62,7 +62,7 @@
                                         <form action="{{ route('officer.destroy-laporan',$report->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600">Hapus Laporan</button>
+                                            <button type="submit" class="text-red-600 hover:underline">Hapus Laporan</button>
                                         </form>
                                     </td>
                                 </tr>
